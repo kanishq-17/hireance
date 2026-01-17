@@ -8,34 +8,36 @@ import { FaGithub } from "react-icons/fa6";
 export const SignUpLeft = () => {
   return (
     <div
-      className="w-full h-full rounded-3xl flex items-end justify-center
-      bg-[url(/bg-img.png)] bg-cover bg-center opacity-90
-      backdrop-blur-xl border border-white/20 text-white"
+      className="w-full h-full rounded-3xl relative overflow-hidden
+  bg-[url(/bg-img.png)] bg-cover bg-center"
     >
-      <div className="text-center pb-10">
-        <p className="text-sm tracking-wide text-neutral-300">Hireance</p>
+      {/* overlay */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
-        <h2 className="mt-2 mb-1 font-medium text-3xl">
-          Get Started with Us
-        </h2>
+      {/* content */}
+      <div className="relative z-10 h-full flex items-end justify-center pb-12 px-8 text-white">
+        <div
+          className="w-full max-w-md rounded-2xl
+      
+      p-6 text-center"
+        >
+          <p className="text-xs tracking-widest uppercase text-neutral-300">
+            Hireance
+          </p>
 
-        <p className="text-sm w-[80%] m-auto text-neutral-300">
-          Complete these easy steps to register your account.
-        </p>
+          <h2 className="mt-3 text-2xl font-semibold">Get started with us</h2>
 
-        <div className="flex flex-col items-center justify-center mt-6 gap-3 font-medium">
-          <Button
-            extraClasses="text-sm p-4 w-full text-left pl-5 bg-white text-black rounded-xl"
-            text="1. Sign up your account"
-          />
-          <Button
-            extraClasses="text-sm p-4 w-full text-left pl-5 bg-white/10 text-white rounded-xl"
-            text="2. Set up your account"
-          />
-          <Button
-            extraClasses="text-sm p-4 w-full text-left pl-5 bg-white/10 text-white rounded-xl"
-            text="3. Set up your profile"
-          />
+          <p className="mt-2 text-sm text-neutral-300">
+            Complete these simple steps to create your account and begin your
+            journey.
+          </p>
+
+          {/* steps */}
+          <div className="mt-6 space-y-3 text-left">
+            <Step active text="Create your account" />
+            <Step text="Set up account details" />
+            <Step text="Complete your profile" />
+          </div>
         </div>
       </div>
     </div>
@@ -58,10 +60,10 @@ export const SignUpRight = ({ onSwitch }) => {
   return (
     <div
       className="w-full h-full text-white rounded-3xl
-      bg-white/10 backdrop-blur-xl border border-white/20
-      flex flex-col justify-center"
+      bg-white/10 backdrop-blur-xl
+      flex flex-col justify-center px-10"
     >
-      <h2 className="mt-10 font-medium text-2xl text-center">
+      <h2 className="mt-2 font-medium text-2xl text-center">
         Sign Up Account
       </h2>
 
@@ -70,7 +72,7 @@ export const SignUpRight = ({ onSwitch }) => {
       </p>
 
       {/* social login */}
-      <div className="mt-10 mx-10 flex gap-3">
+      <div className="mt-10  flex gap-3">
         <div
           className="flex items-center justify-center w-full gap-3 p-3 
           rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 transition"
@@ -88,9 +90,16 @@ export const SignUpRight = ({ onSwitch }) => {
         </div>
       </div>
 
+      {/* divider */}
+      <div className="flex items-center gap-3 my-5 text-neutral-600">
+        <hr className="w-full border-white/20" />
+        <span className="text-xs">or</span>
+        <hr className="w-full border-white/20" />
+      </div>
+
       {/* signup form */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mx-10 mt-10 flex flex-col space-y-5">
+        <div className=" flex flex-col space-y-5">
           {/* names */}
           <div className="flex gap-4">
             <div className="w-full">
@@ -209,6 +218,26 @@ export const SignUpRight = ({ onSwitch }) => {
     </div>
   );
 };
+
+/* ---------------- HELPER ---------------- */
+
+const Step = ({ text, active }) => (
+  <div
+    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm
+    border transition
+    ${
+      active
+        ? "bg-white text-black border-white"
+        : "bg-white/5 text-white border-white/20"
+    }`}
+  >
+    <span
+      className={`h-2 w-2 rounded-full
+      ${active ? "bg-black" : "bg-white/40"}`}
+    />
+    <span>{text}</span>
+  </div>
+);
 
 /* ---------------- EXPORT ---------------- */
 
