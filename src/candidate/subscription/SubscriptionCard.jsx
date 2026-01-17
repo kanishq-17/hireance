@@ -63,7 +63,7 @@ const SubscriptionCard = ({
 
         {/* price */}
         <div className={`mt-5 ${isWhite ? "text-black" : "text-white"}`}>
-          <span className="inline-block text-md">
+          <span className="inline-block text-lg">
             <FaRupeeSign />
           </span>
           <p className="inline text-5xl font-bold ml-1">
