@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LoginLeft, LoginRight } from "./login";
+import { LoginLeft, LoginRight } from "./Login";
 import { SignUpLeft, SignUpRight } from "./SignUp";
 
 const AuthFlip = () => {
