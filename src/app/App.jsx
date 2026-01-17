@@ -36,12 +36,12 @@ import SubscriptionCard from "../candidate/subscription/SubscriptionCard";
 
 const App = () => {
   return (
-    <div className="w-full h-screen flex items-center justify-center  gap-5">
+    <div className="w-full h-screen flex items-center justify-center gap-5">
       <SubscriptionCard
         title="Corporate Plan"
         subtitle="Recruitment solutions for companies"
         price="49,999"
-        duration="year"
+        duration="annually"
         features={[
           "Unlimited job postings",
           "Candidate screening",
@@ -51,6 +51,23 @@ const App = () => {
         cta1="Buy"
         cta2="Contact"
         featured="Most Popular"
+        theme={true}
+      />
+      <SubscriptionCard
+        title="Corporate Plan"
+        subtitle="Recruitment solutions for companies"
+        price="49,999"
+        duration="annually"
+        features={[
+          "Unlimited job postings",
+          "Candidate screening",
+          "Dedicated account manager",
+          "Priority listings",
+        ]}
+        cta1="Buy"
+        cta2="Contact"
+        featured="Most Popular"
+        theme={false}
       />
     </div>
   );
