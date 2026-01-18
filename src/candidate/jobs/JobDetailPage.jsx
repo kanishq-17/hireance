@@ -1,3 +1,4 @@
+import { useNavigate, useParams } from 'react-router-dom';
 import CompanyHeader from "./CompanyHeader";
 import CompanyJobs from "./CompanyJobs";
 import CompanyOverview from "./CompanyOverview";
@@ -8,12 +9,20 @@ import JobSkills from "./JobSkills";
 import StickyJobHeader from "./StickyJobHeader";
 
 const JobDetailPage = () => {
+  const navigate = useNavigate();
+  const { jobId } = useParams();
+
+  const handleApplyClick = () => {
+    navigate(`/apply/${jobId || '1'}`);
+  };
+
   return (
     <section className="w-full bg-neutral-50 px-20 py-8">
       <StickyJobHeader
         companyName="Microsoft"
         position="Associate Project Manager"
         location="Los Angeles, USA"
+        onApply={handleApplyClick}
       />
       {/* Company Header */}
       <CompanyHeader
@@ -23,6 +32,7 @@ const JobDetailPage = () => {
         companyName={"Microsoft Inc."}
         location={"Los Angeles, USA"}
         uploadDate={"2026-01-16T14:35:23.420Z"}
+        onApply={handleApplyClick}
       />
 
       <div className="flex gap-5 mt-8">

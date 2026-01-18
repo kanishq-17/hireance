@@ -14,28 +14,28 @@ const Step3JobPreferences = () => {
       <div className="grid grid-cols-2 gap-4">
         <Input
           label="Position Applied For"
-          {...register("position", step3Validation.position)}
-          error={errors.position}
+          {...register("position_applied_for", step3Validation.position_applied_for)}
+          error={errors.position_applied_for}
         />
 
         <Input
           label="Department / Project"
-          {...register("department", step3Validation.department)}
-          error={errors.department}
+          {...register("department_project", step3Validation.department_project)}
+          error={errors.department_project}
         />
 
         <Input
           type="date"
           label="Expected Date of Joining"
-          {...register("joiningDate", step3Validation.joiningDate)}
-          error={errors.joiningDate}
+          {...register("expected_date_of_joining", step3Validation.expected_date_of_joining)}
+          error={errors.expected_date_of_joining}
         />
 
         <Input
           label="Expected Salary (CTC)"
           placeholder="e.g. 10,00,000"
-          {...register("expectedSalary", step3Validation.expectedSalary)}
-          error={errors.expectedSalary}
+          {...register("expected_salary_ctc", step3Validation.expected_salary_ctc)}
+          error={errors.expected_salary_ctc}
         />
       </div>
     </div>

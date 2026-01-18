@@ -8,11 +8,11 @@ const Step4ExperienceDeclaration = () => {
     formState: { errors },
   } = useFormContext();
 
-  const accepted = watch("declaration");
+  const accepted = watch("declaration_accepted"); // ✅ CHANGED
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "experience",
+    name: "experience_details",
   });
 
   return (
@@ -43,18 +43,18 @@ const Step4ExperienceDeclaration = () => {
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Company Name"
-                {...register(`experience.${index}.companyName`, {
+                {...register(`experience_details.${index}.company_name`, {
                   required: "Company name is required",
                 })}
-                error={errors?.experience?.[index]?.companyName}
+                error={errors?.experience_details?.[index]?.company_name}
               />
 
               <Input
                 label="Position"
-                {...register(`experience.${index}.position`, {
+                {...register(`experience_details.${index}.position`, {
                   required: "Position is required",
                 })}
-                error={errors?.experience?.[index]?.position}
+                error={errors?.experience_details?.[index]?.position}
               />
             </div>
 
@@ -62,18 +62,18 @@ const Step4ExperienceDeclaration = () => {
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Role in Company"
-                {...register(`experience.${index}.role`, {
+                {...register(`experience_details.${index}.role`, {
                   required: "Role is required",
                 })}
-                error={errors?.experience?.[index]?.role}
+                error={errors?.experience_details?.[index]?.role}
               />
 
               <Input
                 label="Project Name"
-                {...register(`experience.${index}.projectName`, {
+                {...register(`experience_details.${index}.project_name`, {
                   required: "Project name is required",
                 })}
-                error={errors?.experience?.[index]?.projectName}
+                error={errors?.experience_details?.[index]?.project_name}
               />
             </div>
 
@@ -82,29 +82,29 @@ const Step4ExperienceDeclaration = () => {
               <Input
                 type="date"
                 label="Start Date"
-                {...register(`experience.${index}.startDate`, {
+                {...register(`experience_details.${index}.start_date`, {
                   required: "Start date is required",
                 })}
-                error={errors?.experience?.[index]?.startDate}
+                error={errors?.experience_details?.[index]?.start_date}
               />
 
               <Input
                 type="date"
                 label="End Date"
-                {...register(`experience.${index}.endDate`, {
+                {...register(`experience_details.${index}.end_date`, {
                   required: "End date is required",
                 })}
-                error={errors?.experience?.[index]?.endDate}
+                error={errors?.experience_details?.[index]?.end_date}
               />
             </div>
 
             {/* Row 4 */}
             <Textarea
               label="Project Description"
-              {...register(`experience.${index}.projectDescription`, {
+              {...register(`experience_details.${index}.project_description`, {
                 required: "Project description is required",
               })}
-              error={errors?.experience?.[index]?.projectDescription}
+              error={errors?.experience_details?.[index]?.project_description}
             />
           </div>
         ))}
@@ -114,13 +114,13 @@ const Step4ExperienceDeclaration = () => {
           type="button"
           onClick={() =>
             append({
-              companyName: "",
+              company_name: "",
               position: "",
               role: "",
-              startDate: "",
-              endDate: "",
-              projectName: "",
-              projectDescription: "",
+              start_date: "",
+              end_date: "",
+              project_name: "",
+              project_description: "",
             })
           }
           className="text-sm font-medium text-black"
@@ -129,12 +129,33 @@ const Step4ExperienceDeclaration = () => {
         </button>
       </div>
 
+      {/* ===== EXPERIENCE BACKGROUND DROPDOWN ===== */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-neutral-700">Overall Experience</label>
+        <select
+          {...register("experience_background", {
+            required: "Experience background is required",
+          })}
+          className="h-11 rounded-lg border border-neutral-300 px-3
+          focus:outline-none focus:ring-2 focus:ring-black/10"
+        >
+          <option value="">Select experience level</option>
+          <option value="Fresher">Fresher</option>
+          <option value="1-2 years">1-2 years</option>
+          <option value="3-5 years">3-5 years</option>
+          <option value="5+ years">5+ years</option>
+        </select>
+        {errors.experience_background && (
+          <p className="text-xs text-red-500">{errors.experience_background.message}</p>
+        )}
+      </div>
+
       {/* ===== DECLARATION ===== */}
       <div className="pt-6 border-t border-neutral-200">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
-            {...register("declaration", { required: true })}
+            {...register("declaration_accepted", { required: true })}
             className="mt-1"
           />
           <p className="text-sm text-neutral-700 leading-relaxed">

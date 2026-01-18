@@ -9,7 +9,7 @@ const Step2Education = () => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "education",
+    name: "educational_qualifications",
   });
 
   return (
@@ -30,37 +30,37 @@ const Step2Education = () => {
       {fields.map((field, index) => (
         <div key={field.id} className="grid grid-cols-4 gap-4 items-start">
           <Input
-            {...register(`education.${index}.qualification`, {
+            {...register(`educational_qualifications.${index}.qualification`, {
               required: "Qualification is required",
             })}
-            error={errors?.education?.[index]?.qualification}
+            error={errors?.educational_qualifications?.[index]?.qualification}
             placeholder="B.Tech / MBA"
           />
 
           <Input
-            {...register(`education.${index}.board`, {
+            {...register(`educational_qualifications.${index}.institution`, {
               required: "Board / University is required",
             })}
-            error={errors?.education?.[index]?.board}
+            error={errors?.educational_qualifications?.[index]?.institution}
             placeholder="University Name"
           />
 
           <Input
             type="number"
-            {...register(`education.${index}.year`, {
+            {...register(`educational_qualifications.${index}.year`, {
               required: "Year is required",
               min: { value: 1950, message: "Invalid year" },
             })}
-            error={errors?.education?.[index]?.year}
+            error={errors?.educational_qualifications?.[index]?.year}
             placeholder="2022"
           />
 
           <div className="flex gap-2">
             <Input
-              {...register(`education.${index}.percentage`, {
+              {...register(`educational_qualifications.${index}.percentage`, {
                 required: "Percentage is required",
               })}
-              error={errors?.education?.[index]?.percentage}
+              error={errors?.educational_qualifications?.[index]?.percentage}
               placeholder="85%"
             />
 
@@ -83,7 +83,7 @@ const Step2Education = () => {
         onClick={() =>
           append({
             qualification: "",
-            board: "",
+            institution: "",
             year: "",
             percentage: "",
           })

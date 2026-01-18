@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "../../shared/components/common/Button";
 
-const StickyJobHeader = ({ companyName, position, location }) => {
+const StickyJobHeader = ({ companyName, position, location, onApply }) => {
   const [visible, setVisible] = useState(false);
   const triggerRef = useRef(null);
 
@@ -48,8 +48,9 @@ const StickyJobHeader = ({ companyName, position, location }) => {
               extraClasses="outline outline-neutral-200 text-neutral-800 hover:bg-neutral-300 px-4 py-2"
             />
             <Button
-              text="Apply"
+              text="Apply" 
               extraClasses="bg-green-600 text-white hover:bg-green-700 px-4 py-2"
+              onClick={onApply}
             />
           </div>
         </div>
