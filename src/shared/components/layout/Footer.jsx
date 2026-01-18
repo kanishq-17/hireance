@@ -1,79 +1,127 @@
-import { FaLinkedin } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa";
-import { FaInstagramSquare } from "react-icons/fa";
-import { BsTwitterX } from "react-icons/bs";
-
 const Footer = () => {
   return (
-    <footer className="bg-black h-screen text-gray-300">
-      {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="space-y-6">
-          <div className="text-white text-3xl font-bold">Hierance</div>
-          <p className="text-md text-gray-400">Connect with us</p>
+    <footer className="relative bg-black text-neutral-400 h-screen">
+      {/* MAIN CONTENT */}
+      <div className="max-w-7xl mx-auto px-10 pt-14">
+        {/* TOP LINKS */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-14 text-sm">
+          {/* PRODUCTS */}
+          <FooterColumn
+            title="Products"
+            links={["Apps", "Workflows", "Database", "Mobile"]}
+          />
 
-          {/* Social Icons */}
-          <div className="flex gap-4 text-lg">
-            <span className="hover:text-white cursor-pointer">
-              <FaFacebook />
-            </span>
-            <span className="hover:text-white cursor-pointer">
-              <FaLinkedin />
-            </span>
-            <span className="hover:text-white cursor-pointer">
-              <FaInstagramSquare />
-            </span>
-            <span className="hover:text-white cursor-pointer">
-              <BsTwitterX />
-            </span>
+          {/* SOLUTIONS */}
+          <FooterColumn
+            title="Solutions"
+            links={["AI apps", "External apps", "Integrations", "Self-hosting"]}
+          />
+
+          {/* RESOURCES */}
+          <FooterColumn title="Resources" links={["Blog", "Reports"]} />
+
+          {/* DEVELOPERS */}
+          <FooterColumn
+            title="Developers"
+            links={[
+              "Documentation",
+              "Changelog",
+              "Status",
+              "Developer Network",
+            ]}
+          />
+
+          {/* COMPANY */}
+          <div className="space-y-5">
+            <h4 className="text-xs tracking-widest text-neutral-500 uppercase">
+              Company
+            </h4>
+
+            <ul className="space-y-3">
+              {["About", "Careers", "Partners"].map((item, i) => (
+                <li
+                  key={i}
+                  className="hover:text-white transition cursor-pointer"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA BUTTONS */}
+            <div className="space-y-3 pt-2">
+              <button
+                className="w-full rounded-full bg-white text-black
+                text-xs font-medium py-2 hover:bg-neutral-200 transition"
+              >
+                Start for free
+              </button>
+              <button
+                className="w-full rounded-full border border-white/20
+                text-xs font-medium py-2 hover:border-white/40 transition"
+              >
+                Book a demo
+              </button>
+            </div>
+
+            {/* LEGAL */}
+            <ul className="space-y-2 pt-2 text-xs">
+              <li className="hover:text-white cursor-pointer">Terms of Use</li>
+              <li className="hover:text-white cursor-pointer">
+                Privacy Policy
+              </li>
+              <li className="hover:text-white cursor-pointer">Security</li>
+            </ul>
           </div>
         </div>
 
-        <div>
-          <ul className="space-y-3 text-sm">
-            <li className="hover:text-white cursor-pointer text-lg">
-              About Us
-            </li>
-            <li className="hover:text-white cursor-pointer text-lg">Support</li>
-            <li className="hover:text-white cursor-pointer text-lg">Careers</li>
-          </ul>
-        </div>
+        {/* BIG BRAND TEXT */}
+        <div className="mt-8 border-t border-white/10 pt-14">
+          <h1
+            className="text-[120px] md:text-[180px] font-extrabold
+            tracking-tight text-white/90 leading-none select-none"
+          >
+            Hireance
+          </h1>
 
-        <div>
-          <ul className="space-y-3 text-sm">
-            <li className="hover:text-white cursor-pointer text-lg">
-              Privacy Policy
-            </li>
-            <li className="hover:text-white cursor-pointer text-lg">
-              Terms & Conditions
-            </li>
-            <li className="hover:text-white cursor-pointer text-lg">
-              Refund Policy
-            </li>
-          </ul>
-        </div>
-
-        {/* Get In Touch */}
-        <div>
-          <h4 className="text-white font-semibold mb-4 uppercase tracking-wide">
-            Get In Touch
-          </h4>
-
-          <div className="space-y-4 text-md text-gray-400">
-            <p className="hover:text-white cursor-pointer">info@hireance.com</p>
-
+          {/* BOTTOM META */}
+          <div
+            className="mt-6 flex flex-col md:flex-row 
+            justify-between gap-4 text-xs text-neutral-500"
+          >
             <p>Address: Ameerpet, Hyderabad, India</p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:info@hireance.com"
+                className="hover:text-white transition"
+              >
+                info@hireance.com
+              </a>
+            </p>
+            <p>© Hireance 2026</p>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-gray-800 py-6 text-center text-sm text-gray-400">
-        © 2025 Hierance Pvt. Ltd. <br />
-        All Rights Reserved.
       </div>
     </footer>
   );
 };
 
 export default Footer;
+
+/* ---------- HELPER ---------- */
+
+const FooterColumn = ({ title, links }) => (
+  <div>
+    <h4 className="text-xs tracking-widest text-neutral-500 uppercase mb-4">
+      {title}
+    </h4>
+    <ul className="space-y-3">
+      {links.map((link, idx) => (
+        <li key={idx} className="hover:text-white transition cursor-pointer">
+          {link}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
