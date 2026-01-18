@@ -3,13 +3,23 @@ import { LiaSuitcaseSolid } from "react-icons/lia";
 import { BsCurrencyRupee } from "react-icons/bs";
 import { LuMapPin } from "react-icons/lu";
 
-const JobCard = () => {
-  const [techStack] = useState(["React", "Node", "TypeScript"]);
+const JobCard = ({
+  companyName,
+  jobTitle,
+  jobType,
+  logo,
+  uploadDate,
+  techStack,
+  Experience,
+  salary,
+  location,
+}) => {
+  // const [techStack] = useState(["React", "Node", "TypeScript"]);
 
   return (
     <section className="bg-black w-full min-h-screen flex items-center justify-center p-6">
       <div
-        className="w-full max-w-md bg-white rounded-2xl p-6
+        className="max-w-md bg-white rounded-2xl p-6
         shadow-[0_20px_40px_rgba(0,0,0,0.15)]
         hover:shadow-[0_30px_60px_rgba(0,0,0,0.2)]
         transition-all duration-300"
@@ -17,25 +27,29 @@ const JobCard = () => {
         {/* Top Row */}
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="w-11 h-11 rounded-full bg-black text-white 
-            flex items-center justify-center font-semibold">
+          <div
+            className="w-11 h-11 rounded-full bg-black text-white 
+            flex items-center justify-center font-semibold"
+          >
             H
           </div>
 
-          <span className="text-xs font-medium px-3 py-1 rounded-full
-            bg-emerald-100 text-emerald-700">
-            Part-time
+          <span
+            className="text-xs font-medium px-3 py-1 rounded-full
+            bg-emerald-100 text-emerald-700"
+          >
+            {jobType}
           </span>
         </div>
 
         {/* Company + Date */}
         <p className="mt-4 text-sm text-neutral-500">
-          Hireance · <span className="text-neutral-400">5 days ago</span>
+          {companyName} · <span className="text-neutral-400">{uploadDate}</span>
         </p>
 
         {/* Job Title */}
         <h2 className="mt-1 text-lg font-semibold text-neutral-900 leading-snug">
-          Senior Software Developer
+          {jobTitle}
         </h2>
 
         {/* Skills */}
@@ -53,18 +67,10 @@ const JobCard = () => {
           <Meta
             icon={<LiaSuitcaseSolid />}
             label="Experience"
-            value="1–3 yrs"
+            value={Experience}
           />
-          <Meta
-            icon={<BsCurrencyRupee />}
-            label="Salary"
-            value="5–8 LPA"
-          />
-          <Meta
-            icon={<LuMapPin />}
-            label="Location"
-            value="Remote"
-          />
+          <Meta icon={<BsCurrencyRupee />} label="Salary" value={salary} />
+          <Meta icon={<LuMapPin />} label="Location" value={location} />
         </div>
 
         {/* CTA */}
