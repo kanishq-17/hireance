@@ -93,8 +93,8 @@ const App = () => {
       <Footer /> */}
       {/* <JobDetailPage />
       <Footer /> */}
-      {/* <ApplyFormPage />  */}
-      <PaymentSuccessCard />
+      <ApplyFormPage /> 
+      {/* <PaymentSuccessCard /> */}
     </div>
   );
 };
