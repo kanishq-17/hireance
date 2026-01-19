@@ -17,32 +17,26 @@ const Step4ExperienceDeclaration = () => {
 
   return (
     <div className="space-y-8">
-      {/* ===== EXPERIENCE SECTION ===== */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-neutral-900">
-          Experience Background
-        </h3>
-
+      <Section title="Experience Background">
         {fields.map((field, index) => (
           <div
             key={field.id}
             className="border border-neutral-200 rounded-xl p-5 space-y-4 relative"
           >
-            {/* Remove Button */}
             {fields.length > 1 && (
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="absolute top-3 right-3 text-red-500 text-sm"
+                className="absolute top-3 right-3 text-red-500"
               >
                 ✕
               </button>
             )}
 
-            {/* Row 1 */}
-            <div className="grid grid-cols-2 gap-4">
+            <Grid>
               <Input
                 label="Company Name"
+                placeholder="Company name"
                 {...register(`experience.${index}.companyName`, {
                   required: "Company name is required",
                 })}
@@ -51,17 +45,16 @@ const Step4ExperienceDeclaration = () => {
 
               <Input
                 label="Position"
+                placeholder="Your position"
                 {...register(`experience.${index}.position`, {
                   required: "Position is required",
                 })}
                 error={errors?.experience?.[index]?.position}
               />
-            </div>
 
-            {/* Row 2 */}
-            <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Role in Company"
+                placeholder="Your role"
                 {...register(`experience.${index}.role`, {
                   required: "Role is required",
                 })}
@@ -70,15 +63,13 @@ const Step4ExperienceDeclaration = () => {
 
               <Input
                 label="Project Name"
+                placeholder="Project name"
                 {...register(`experience.${index}.projectName`, {
                   required: "Project name is required",
                 })}
                 error={errors?.experience?.[index]?.projectName}
               />
-            </div>
 
-            {/* Row 3 */}
-            <div className="grid grid-cols-2 gap-4">
               <Input
                 type="date"
                 label="Start Date"
@@ -96,11 +87,11 @@ const Step4ExperienceDeclaration = () => {
                 })}
                 error={errors?.experience?.[index]?.endDate}
               />
-            </div>
+            </Grid>
 
-            {/* Row 4 */}
             <Textarea
               label="Project Description"
+              placeholder="Describe your project work"
               {...register(`experience.${index}.projectDescription`, {
                 required: "Project description is required",
               })}
@@ -109,7 +100,6 @@ const Step4ExperienceDeclaration = () => {
           </div>
         ))}
 
-        {/* Add Experience */}
         <button
           type="button"
           onClick={() =>
@@ -117,9 +107,9 @@ const Step4ExperienceDeclaration = () => {
               companyName: "",
               position: "",
               role: "",
+              projectName: "",
               startDate: "",
               endDate: "",
-              projectName: "",
               projectDescription: "",
             })
           }
@@ -127,39 +117,48 @@ const Step4ExperienceDeclaration = () => {
         >
           + Add another experience
         </button>
-      </div>
+      </Section>
 
-      {/* ===== DECLARATION ===== */}
-      <div className="pt-6 border-t border-neutral-200">
-        <label className="flex items-start gap-3 cursor-pointer">
+      <Section title="Declaration">
+        <label className="flex gap-3 items-start">
           <input
             type="checkbox"
             {...register("declaration", { required: true })}
             className="mt-1"
           />
-          <p className="text-sm text-neutral-700 leading-relaxed">
-            I hereby declare that the information given above is true and
-            correct to the best of my knowledge.
-          </p>
+          <span className="text-sm text-neutral-700">
+            I hereby declare that the information provided is true and correct.
+          </span>
         </label>
 
         {!accepted && (
-          <p className="text-xs text-red-500 mt-2">
-            Declaration is required to submit the application.
+          <p className="text-xs text-red-500">
+            Declaration is required to submit the form
           </p>
         )}
-      </div>
+      </Section>
     </div>
   );
 };
 
 export default Step4ExperienceDeclaration;
 
-/* ---------- INPUTS ---------- */
+/* ---------- UI HELPERS ---------- */
+
+const Section = ({ title, children }) => (
+  <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-6 space-y-4">
+    <h3 className="text-sm font-semibold text-neutral-900">{title}</h3>
+    {children}
+  </div>
+);
+
+const Grid = ({ children }) => (
+  <div className="grid grid-cols-2 gap-4">{children}</div>
+);
 
 const Input = ({ label, error, ...props }) => (
   <div className="flex flex-col gap-1">
-    <label className="text-sm text-neutral-700">{label}</label>
+    <label className="text-xs font-medium text-neutral-700">{label}</label>
     <input
       {...props}
       className="h-11 rounded-lg border border-neutral-300 px-3
@@ -171,7 +170,7 @@ const Input = ({ label, error, ...props }) => (
 
 const Textarea = ({ label, error, ...props }) => (
   <div className="flex flex-col gap-1">
-    <label className="text-sm text-neutral-700">{label}</label>
+    <label className="text-xs font-medium text-neutral-700">{label}</label>
     <textarea
       rows={4}
       {...props}

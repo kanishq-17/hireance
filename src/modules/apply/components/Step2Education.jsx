@@ -13,62 +13,51 @@ const Step2Education = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium text-neutral-900">
-        Educational Qualifications
-      </h3>
-
-      {/* Table Header */}
-      <div className="grid grid-cols-4 gap-4 text-sm font-medium text-neutral-600">
-        <p>Qualification</p>
-        <p>Board / University</p>
-        <p>Year</p>
-        <p>Percentage</p>
-      </div>
-
-      {/* Table Rows */}
+    <Section title="Educational Qualifications">
       {fields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-4 gap-4 items-start">
+        <div
+          key={field.id}
+          className="grid grid-cols-4 gap-4 items-start mb-4"
+        >
           <Input
+            placeholder="Qualification (e.g. B.Tech)"
             {...register(`education.${index}.qualification`, {
               required: "Qualification is required",
             })}
             error={errors?.education?.[index]?.qualification}
-            placeholder="B.Tech / MBA"
           />
 
           <Input
+            placeholder="Board / University"
             {...register(`education.${index}.board`, {
               required: "Board / University is required",
             })}
             error={errors?.education?.[index]?.board}
-            placeholder="University Name"
           />
 
           <Input
             type="number"
+            placeholder="Year"
             {...register(`education.${index}.year`, {
               required: "Year is required",
-              min: { value: 1950, message: "Invalid year" },
             })}
             error={errors?.education?.[index]?.year}
-            placeholder="2022"
           />
 
           <div className="flex gap-2">
             <Input
+              placeholder="Percentage"
               {...register(`education.${index}.percentage`, {
                 required: "Percentage is required",
               })}
               error={errors?.education?.[index]?.percentage}
-              placeholder="85%"
             />
 
             {fields.length > 1 && (
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="text-red-500 text-sm mt-3"
+                className="text-red-500 text-sm mt-2"
               >
                 ✕
               </button>
@@ -77,7 +66,6 @@ const Step2Education = () => {
         </div>
       ))}
 
-      {/* Add Row */}
       <button
         type="button"
         onClick={() =>
@@ -90,15 +78,22 @@ const Step2Education = () => {
         }
         className="text-sm font-medium text-black"
       >
-        + Add another qualification
+        + Add qualification
       </button>
-    </div>
+    </Section>
   );
 };
 
 export default Step2Education;
 
-/* ---------- INPUT ---------- */
+/* ---------- UI HELPERS ---------- */
+
+const Section = ({ title, children }) => (
+  <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-6 space-y-4">
+    <h3 className="text-sm font-semibold text-neutral-900">{title}</h3>
+    {children}
+  </div>
+);
 
 const Input = ({ error, ...props }) => (
   <div className="flex flex-col gap-1 w-full">
