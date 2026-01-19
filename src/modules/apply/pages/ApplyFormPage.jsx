@@ -1,3 +1,5 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { FormProvider } from "react-hook-form";
 import ApplyLayout from "../components/ApplyLayout";
 import Stepper from "../components/Stepper";
@@ -8,7 +10,54 @@ import Step4ExperienceDeclaration from "../components/Step4ExperienceDeclaration
 import useApplyForm from "../hooks/useApplyForm";
 
 const ApplyFormPage = () => {
-  const { form, currentStep, nextStep, prevStep, submitForm, loading, error } = useApplyForm();
+  const { jobId } = useParams();
+  const navigate = useNavigate();
+  const [job, setJob] = useState(null);
+  const [jobLoading, setJobLoading] = useState(true);
+
+  const { form, currentStep, nextStep, prevStep, submitForm, loading, error } = useApplyForm(job);
+
+  // Fetch job details
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      if (!jobId) {
+        alert("No job specified");
+        navigate("/jobs");
+        return;
+      }
+
+      try {
+        setJobLoading(true);
+        console.log("[ApplyFormPage] Fetching job:", jobId);
+
+        const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`);
+        const result = await response.json();
+
+        if (result.success) {
+          console.log("[ApplyFormPage] Job loaded:", result.job.title);
+          setJob(result.job);
+          
+          // Pre-fill job-related fields
+          if (form) {
+            form.setValue("position", result.job.position);
+            form.setValue("department", result.job.department || "");
+          }
+        } else {
+          console.error("[ApplyFormPage] Job not found");
+          alert("Job not found");
+          navigate("/jobs");
+        }
+      } catch (error) {
+        console.error("[ApplyFormPage] Error fetching job:", error);
+        alert("Failed to load job details. Please check if backend server is running.");
+        navigate("/jobs");
+      } finally {
+        setJobLoading(false);
+      }
+    };
+
+    fetchJobDetails();
+  }, [jobId, navigate, form]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -17,7 +66,7 @@ const ApplyFormPage = () => {
       case 2:
         return <Step2Education />;
       case 3:
-        return <Step3JobPreferences />;
+        return <Step3JobPreferences job={job} />;
       case 4:
         return <Step4ExperienceDeclaration />;
       default:
@@ -25,56 +74,112 @@ const ApplyFormPage = () => {
     }
   };
 
+  // Loading state
+  if (jobLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading application form...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state - Job not found
+  if (!job) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-xl max-w-md">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Job Not Found</h2>
+          <p className="text-gray-600 mb-6">Unable to load job details. The job may have been removed.</p>
+          <button
+            onClick={() => navigate("/jobs")}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium transition-all"
+          >
+            Back to Jobs
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <FormProvider {...form}>
-      <ApplyLayout
-        title="Job Application Form"
-        subtitle="Please fill out all required information"
-        stepper={<Stepper currentStep={currentStep} />}
-        footer={
-          <div className="w-full">
-            {error && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm font-medium">{error}</p>
-              </div>
-            )}
-            <div className="flex justify-between gap-4">
+      <form onSubmit={form.handleSubmit(submitForm)}>
+        <ApplyLayout
+          title="Employment Application Form"
+          subtitle={`Complete all steps to apply for ${job.position} at ${job.company_name}`}
+          jobInfo={{
+            position: job.position,
+            company: job.company_name,
+            location: job.location,
+            salary: job.salary,
+            logo: job.company_logo,
+            isPremium: job.is_paid_service,
+          }}
+          stepper={<Stepper currentStep={currentStep} />}
+          footer={
+            <>
+              {/* Error Message */}
+              {error && (
+                <div className="flex-1 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+                  {error}
+                </div>
+              )}
+
+              {/* Previous Button */}
               {currentStep > 1 && (
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                  disabled={loading}
+                  className="px-6 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-all"
                 >
-                  Back
+                  ← Back
                 </button>
               )}
+
+              {/* Spacer */}
+              <div className="flex-1" />
+
+              {/* Next Button */}
               {currentStep < 4 && (
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ml-auto disabled:opacity-50"
-                  disabled={loading}
+                  className="px-6 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-neutral-800 transition-all"
                 >
-                  Next
+                  Next →
                 </button>
               )}
+
+              {/* Submit Button */}
               {currentStep === 4 && (
                 <button
-                  type="button"
-                  onClick={form.handleSubmit(submitForm)}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors ml-auto disabled:opacity-50"
+                  type="submit"
                   disabled={loading}
+                  className="px-8 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
-                  {loading ? 'Submitting...' : 'Submit & Pay'}
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      Submit & Pay
+                      {job.is_paid_service && ` (₹${job.professional_fee})`}
+                    </>
+                  )}
                 </button>
               )}
-            </div>
-          </div>
-        }
-      >
-        {renderStep()}
-      </ApplyLayout>
+            </>
+          }
+        >
+          {renderStep()}
+        </ApplyLayout>
+      </form>
     </FormProvider>
   );
 };

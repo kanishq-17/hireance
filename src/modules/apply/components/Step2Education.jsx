@@ -13,62 +13,51 @@ const Step2Education = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium text-neutral-900">
-        Educational Qualifications
-      </h3>
-
-      {/* Table Header */}
-      <div className="grid grid-cols-4 gap-4 text-sm font-medium text-neutral-600">
-        <p>Qualification</p>
-        <p>Board / University</p>
-        <p>Year</p>
-        <p>Percentage</p>
-      </div>
-
-      {/* Table Rows */}
+    <Section title="Educational Qualifications">
       {fields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-4 gap-4 items-start">
+        <div
+          key={field.id}
+          className="grid grid-cols-4 gap-4 items-start mb-4"
+        >
           <Input
+            placeholder="Qualification (e.g. B.Tech)"
             {...register(`educational_qualifications.${index}.qualification`, {
               required: "Qualification is required",
             })}
             error={errors?.educational_qualifications?.[index]?.qualification}
-            placeholder="B.Tech / MBA"
           />
 
           <Input
-            {...register(`educational_qualifications.${index}.institution`, {
+            placeholder="Board / University"
+            {...register(`educational_qualifications.${index}.board`, {
               required: "Board / University is required",
             })}
-            error={errors?.educational_qualifications?.[index]?.institution}
-            placeholder="University Name"
+            error={errors?.educational_qualifications?.[index]?.board}
           />
 
           <Input
             type="number"
+            placeholder="Year"
             {...register(`educational_qualifications.${index}.year`, {
               required: "Year is required",
-              min: { value: 1950, message: "Invalid year" },
             })}
             error={errors?.educational_qualifications?.[index]?.year}
-            placeholder="2022"
           />
 
           <div className="flex gap-2">
             <Input
+              placeholder="Percentage"
               {...register(`educational_qualifications.${index}.percentage`, {
                 required: "Percentage is required",
               })}
               error={errors?.educational_qualifications?.[index]?.percentage}
-              placeholder="85%"
             />
 
             {fields.length > 1 && (
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="text-red-500 text-sm mt-3"
+                className="text-red-500 text-sm font-bold hover:text-red-700 px-2"
               >
                 ✕
               </button>
@@ -77,28 +66,34 @@ const Step2Education = () => {
         </div>
       ))}
 
-      {/* Add Row */}
       <button
         type="button"
         onClick={() =>
           append({
             qualification: "",
-            institution: "",
+            board: "",
             year: "",
             percentage: "",
           })
         }
-        className="text-sm font-medium text-black"
+        className="text-sm font-medium text-black hover:text-blue-600"
       >
-        + Add another qualification
+        + Add qualification
       </button>
-    </div>
+    </Section>
   );
 };
 
 export default Step2Education;
 
-/* ---------- INPUT ---------- */
+/* ---------- UI HELPERS ---------- */
+
+const Section = ({ title, children }) => (
+  <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-6 space-y-4">
+    <h3 className="text-sm font-semibold text-neutral-900">{title}</h3>
+    {children}
+  </div>
+);
 
 const Input = ({ error, ...props }) => (
   <div className="flex flex-col gap-1 w-full">
