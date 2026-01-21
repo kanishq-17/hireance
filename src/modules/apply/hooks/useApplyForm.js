@@ -25,16 +25,16 @@ const useApplyForm = (job) => {
       pan_no: "",
       current_address: "",
       permanent_address: "",
-      
+
       // Step 2 - Education
       educational_qualifications: [],
-      
+
       // Step 3 - Job Preferences
       position_applied_for: "",
       department_project: "",
       expected_date_of_joining: "",
       expected_salary_ctc: "",
-      
+
       // Step 4 - Experience & Declaration
       experience_background: [],
       declaration_accepted: false,
@@ -62,6 +62,7 @@ const useApplyForm = (job) => {
     try {
       setLoading(true);
       setError(null);
+
       console.log("[useApplyForm] Submitting application:", data);
 
       if (!job) {
@@ -84,28 +85,32 @@ const useApplyForm = (job) => {
         pan_no: data.pan_no,
         current_address: data.current_address,
         permanent_address: data.permanent_address,
-        
+
         // Education (JSONB array)
         educational_qualifications: data.educational_qualifications || [],
-        
+
         // Job Details
+        job_id: job.id,
+        company_name: job.company_name,
         position_applied_for: data.position_applied_for,
         department_project: data.department_project,
         expected_date_of_joining: data.expected_date_of_joining,
         expected_salary_ctc: parseFloat(data.expected_salary_ctc),
-        
+
         // Experience (JSONB array)
         experience_background: data.experience_background || [],
-        
+
         // Declaration
         declaration_accepted: data.declaration_accepted,
         declaration_date: data.declaration_accepted ? new Date().toISOString() : null,
-        
+
         // Status
         application_status: 'pending',
       };
 
       console.log("[useApplyForm] Sending to backend:", applicationData);
+      console.log("[useApplyForm] Job ID:", job.id);
+      console.log("[useApplyForm] Company Name:", job.company_name);
 
       // Submit to backend
       const response = await fetch("http://localhost:5000/api/applications/submit", {
@@ -133,6 +138,7 @@ const useApplyForm = (job) => {
         alert("Application submitted successfully!");
         navigate("/jobs");
       }
+
     } catch (err) {
       console.error("[useApplyForm] Error:", err);
       setError(err.message || "Failed to submit application");
@@ -167,10 +173,13 @@ const useApplyForm = (job) => {
         throw new Error(paymentResult.error || "Failed to create payment order");
       }
 
-      console.log("[useApplyForm] Redirecting to payment page");
-      
-      // Redirect to payment page
-      window.location.href = `http://localhost:5000${paymentResult.paymentUrl}`;
+      console.log("[useApplyForm] Payment order created successfully");
+      console.log("[useApplyForm] Payment URL:", paymentResult.paymentUrl);
+
+      // ✅ FIX: Use payment URL directly (it's already a full URL from EventsFare)
+      // The backend returns: "https://payments.eventsfare.com/?payId=..."
+      window.location.href = paymentResult.paymentUrl;
+
     } catch (err) {
       console.error("[useApplyForm] Payment error:", err);
       throw err;

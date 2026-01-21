@@ -120,6 +120,7 @@ const ApplyFormPage = () => {
             isPremium: job.is_paid_service,
           }}
           stepper={<Stepper currentStep={currentStep} />}
+          currentStep={currentStep}
           footer={
             <>
               {/* Error Message */}

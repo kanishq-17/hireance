@@ -16,6 +16,7 @@ import SubscriptionCard from "../candidate/subscription/SubscriptionCard";
 
 // Application & Payment
 import ApplyFormPage from "../modules/apply/pages/ApplyFormPage";
+import PaymentResponsePage from "./pages/PaymentResponsePage";
 
 // Error Pages
 import UnauthorizedAccess from "../pages/error/unauthorizedAccess";
@@ -42,10 +43,9 @@ const App = () => {
             {/* Application Form */}
             <Route path="/apply/:jobId" element={<ApplyFormPage />} />
             
-            {/* ✅ FIXED: Application Success Route */}
+            {/* Payment Routes */}
+            <Route path="/payment/response" element={<PaymentResponsePage />} />
             <Route path="/payment/success" element={<ApplicationSuccessPage />} />
-            
-            {/* Payment Error Route */}
             <Route 
               path="/payment/error" 
               element={
@@ -68,6 +68,9 @@ const App = () => {
                 </div>
               } 
             />
+            
+            {/* Application View Route */}
+            <Route path="/application/:id" element={<ApplicationSuccessPage />} />
             
             {/* Authentication */}
             <Route path="/auth" element={<AuthFlip />} />

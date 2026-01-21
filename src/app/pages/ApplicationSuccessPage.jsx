@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, User, Mail, Phone, FileText, CreditCard, Calendar, Building, Download, Loader } from 'lucide-react';
+import { CheckCircle, User, Mail, Phone, FileText, CreditCard, Calendar, Building, Download, Loader, Briefcase } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import Header from '../../modules/apply/components/layout/Header';
 
 const ApplicationSuccessPage = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ const ApplicationSuccessPage = () => {
     email: '',
     phone: '',
     position: '',
+    companyName: '',
     department: '',
     applicationNumber: '',
     submittedDate: '',
@@ -28,11 +30,19 @@ const ApplicationSuccessPage = () => {
   const [loading, setLoading] = useState(true);
   const [downloadingReceipt, setDownloadingReceipt] = useState(false);
 
+  // Generate 12-character alphanumeric application number
+  const generateShortAppNumber = (fullId) => {
+    if (!fullId) return 'N/A';
+    // Remove dashes and take first 12 characters, uppercase
+    const cleaned = fullId.replace(/-/g, '').toUpperCase();
+    return cleaned.substring(0, 12);
+  };
+
   useEffect(() => {
     const fetchApplicationDetails = async () => {
-      console.log('=== APPLICATION SUCCESS PAGE LOADED ===');
-      console.log('Current URL:', window.location.href);
-      console.log('Search Params:', searchParams.toString());
+      console.log('[APPLICATION SUCCESS] Page loaded');
+      console.log('[APPLICATION SUCCESS] URL:', window.location.href);
+      console.log('[APPLICATION SUCCESS] Search Params:', searchParams.toString());
 
       const orderId = searchParams.get('order_id');
       const paymentId = searchParams.get('payment_id');
@@ -41,12 +51,12 @@ const ApplicationSuccessPage = () => {
       const status = searchParams.get('status');
       const date = searchParams.get('date');
 
-      console.log('Application Success - Received params:', { 
+      console.log('[APPLICATION SUCCESS] Received params:', { 
         orderId, paymentId, applicationId, amount, status, date 
       });
 
       if (!applicationId) {
-        console.error('No application ID found, redirecting to home');
+        console.error('[ERROR] No application ID found, redirecting to home');
         navigate('/');
         return;
       }
@@ -57,6 +67,7 @@ const ApplicationSuccessPage = () => {
           email: 'N/A',
           phone: 'N/A',
           position: 'N/A',
+          companyName: 'N/A',
           department: 'N/A'
         };
 
@@ -71,6 +82,7 @@ const ApplicationSuccessPage = () => {
               email: app.email_id || 'N/A',
               phone: app.mobile_no || 'N/A',
               position: app.position_applied_for || 'N/A',
+              companyName: app.company_name || 'N/A',
               department: app.department_project || 'N/A'
             };
             console.log('[SUCCESS] Fetched application details:', applicantInfo);
@@ -113,13 +125,16 @@ const ApplicationSuccessPage = () => {
           formattedTransactionDate = formatted;
         }
 
+        const shortAppNumber = generateShortAppNumber(applicationId);
+
         setApplicationData({
           fullName: applicantInfo.fullName,
           email: applicantInfo.email,
           phone: applicantInfo.phone,
           position: applicantInfo.position,
+          companyName: applicantInfo.companyName,
           department: applicantInfo.department,
-          applicationNumber: applicationId,
+          applicationNumber: shortAppNumber,
           submittedDate: formattedSubmissionDate,
           orderId: orderId || 'N/A',
           paymentId: paymentId || 'N/A',
@@ -129,10 +144,10 @@ const ApplicationSuccessPage = () => {
           transactionDate: formattedTransactionDate
         });
 
-        console.log('[SUCCESS] Application data set');
+        console.log('[SUCCESS] Application data set with short ID:', shortAppNumber);
 
       } catch (error) {
-        console.error('Error processing application details:', error);
+        console.error('[ERROR] Error processing application details:', error);
       } finally {
         setLoading(false);
       }
@@ -149,7 +164,7 @@ const ApplicationSuccessPage = () => {
     setDownloadingReceipt(true);
     try {
       if (!receiptRef.current) {
-        console.error('Receipt reference not found');
+        console.error('[ERROR] Receipt reference not found');
         setDownloadingReceipt(false);
         return;
       }
@@ -188,7 +203,7 @@ const ApplicationSuccessPage = () => {
         heightLeft -= pageHeight - 20;
       }
 
-      const fileName = `Receipt_${applicationData.applicationNumber.slice(0, 8)}_${new Date().getTime()}.pdf`;
+      const fileName = `Application_Receipt_${applicationData.applicationNumber}_${new Date().getTime()}.pdf`;
       pdf.save(fileName);
 
       console.log('[SUCCESS] Receipt downloaded:', fileName);
@@ -202,352 +217,371 @@ const ApplicationSuccessPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-700 font-medium text-lg">Loading application details...</p>
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-700 font-medium text-lg">Loading application details...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
-            <CheckCircle className="w-12 h-12 text-green-600" />
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Application Submitted Successfully!
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Thank you for applying. We've received your application.
-          </p>
-        </div>
-
-        <div 
-          ref={receiptRef} 
-          style={{ 
-            position: 'absolute',
-            left: '-9999px',
-            top: '0',
-            backgroundColor: 'white',
-            padding: '40px',
-            width: '800px',
-            fontFamily: 'Arial, sans-serif'
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <img 
-              src="/hireance-SVG.svg" 
-              alt="Hireance Logo" 
-              style={{ height: '50px', marginBottom: '20px' }}
-            />
-            <h1 style={{ margin: '0', fontSize: '28px', color: '#1f2937', fontWeight: 'bold', borderBottom: '3px solid #3b82f6', paddingBottom: '15px' }}>
-              APPLICATION RECEIPT
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Application Submitted Successfully!
             </h1>
-            <p style={{ margin: '10px 0 0 0', fontSize: '14px', color: '#666' }}>
-              Thank you for your application submission
+            <p className="text-gray-600 text-lg">
+              Thank you for applying. We have received your application.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px', padding: '20px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
-            <div>
-              <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                Application Number
-              </p>
-              <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: 'bold', wordBreak: 'break-all', fontFamily: 'monospace' }}>
-                {applicationData.applicationNumber}
+          {/* Hidden Receipt for PDF Download */}
+          <div 
+            ref={receiptRef} 
+            style={{ 
+              position: 'absolute',
+              left: '-9999px',
+              top: '0',
+              backgroundColor: 'white',
+              padding: '40px',
+              width: '800px',
+              fontFamily: 'Arial, sans-serif'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <img 
+                src="/hireance-SVG.svg" 
+                alt="Hireance Logo" 
+                style={{ height: '50px', marginBottom: '20px' }}
+              />
+              <h1 style={{ margin: '0', fontSize: '28px', color: '#1f2937', fontWeight: 'bold', borderBottom: '3px solid #3b82f6', paddingBottom: '15px' }}>
+                APPLICATION RECEIPT
+              </h1>
+              <p style={{ margin: '10px 0 0 0', fontSize: '14px', color: '#666' }}>
+                Thank you for your application submission
               </p>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                Date of Submission
-              </p>
-              <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-                {applicationData.submittedDate}
-              </p>
-            </div>
-          </div>
 
-          <div style={{ marginBottom: '30px' }}>
-            <h2 style={{ margin: '0 0 15px 0', fontSize: '18px', fontWeight: 'bold', color: '#1f2937', borderBottom: '2px solid #3b82f6', paddingBottom: '10px' }}>
-              APPLICANT DETAILS
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px', padding: '20px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
               <div>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                  Full Name
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                  Application Number
                 </p>
-                <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-                  {applicationData.fullName}
-                </p>
-              </div>
-              <div>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                  Email
-                </p>
-                <p style={{ margin: '0', fontSize: '13px', color: '#1f2937', fontWeight: '500', wordBreak: 'break-all' }}>
-                  {applicationData.email}
-                </p>
-              </div>
-              <div>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                  Phone
-                </p>
-                <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-                  {applicationData.phone}
-                </p>
-              </div>
-              <div>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                  Department
-                </p>
-                <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-                  {applicationData.department}
-                </p>
-              </div>
-            </div>
-            <div style={{ marginTop: '15px' }}>
-              <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
-                Position Applied For
-              </p>
-              <p style={{ margin: '0', fontSize: '16px', color: '#1f2937', fontWeight: 'bold' }}>
-                {applicationData.position}
-              </p>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '30px' }}>
-            <h2 style={{ margin: '0 0 15px 0', fontSize: '18px', fontWeight: 'bold', color: '#1f2937', borderBottom: '2px solid #3b82f6', paddingBottom: '10px' }}>
-              PAYMENT DETAILS
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-              <div style={{ padding: '15px', backgroundColor: '#dbeafe', borderRadius: '8px', border: '2px solid #3b82f6' }}>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#1e40af', textTransform: 'uppercase' }}>
-                  Amount Paid
-                </p>
-                <p style={{ margin: '0', fontSize: '28px', color: '#1e40af', fontWeight: 'bold' }}>
-                  Rs {applicationData.amount}
-                </p>
-              </div>
-              <div style={{ padding: '15px', backgroundColor: '#dcfce7', borderRadius: '8px', border: '2px solid #16a34a' }}>
-                <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#166534', textTransform: 'uppercase' }}>
-                  Payment Status
-                </p>
-                <p style={{ margin: '0', fontSize: '24px', color: '#15803d', fontWeight: 'bold' }}>
-                  {applicationData.paymentStatus}
-                </p>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
-                  Order ID
-                </p>
-                <p style={{ margin: '0', fontSize: '11px', color: '#1f2937', fontFamily: 'monospace', wordBreak: 'break-all' }}>
-                  {applicationData.orderId}
-                </p>
-              </div>
-              <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
-                  Payment ID
-                </p>
-                <p style={{ margin: '0', fontSize: '11px', color: '#1f2937', fontFamily: 'monospace', wordBreak: 'break-all' }}>
-                  {applicationData.paymentId}
-                </p>
-              </div>
-              <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
-                  Payment Method
-                </p>
-                <p style={{ margin: '0', fontSize: '12px', color: '#1f2937', fontWeight: '500' }}>
-                  {applicationData.paymentMethod}
-                </p>
-              </div>
-              <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
-                  Transaction Date
-                </p>
-                <p style={{ margin: '0', fontSize: '12px', color: '#1f2937', fontWeight: '500' }}>
-                  {applicationData.transactionDate}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '2px solid #e5e7eb', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666', fontWeight: '500' }}>
-              This is an auto-generated receipt. Please keep it for your records.
-            </p>
-            <p style={{ margin: '0', fontSize: '11px', color: '#999' }}>
-              Generated on {new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-              <User className="w-6 h-6" />
-              Applicant Details
-            </h2>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm mb-1">Full Name</p>
-                <p className="text-white font-semibold text-lg">{applicationData.fullName}</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
-                  <Mail className="w-4 h-4" /> Email
-                </p>
-                <p className="text-white font-semibold break-all">{applicationData.email}</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
-                  <Phone className="w-4 h-4" /> Phone
-                </p>
-                <p className="text-white font-semibold">{applicationData.phone}</p>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
-                  <Building className="w-4 h-4" /> Department
-                </p>
-                <p className="text-white font-semibold">{applicationData.department}</p>
-              </div>
-            </div>
-
-            <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
-                <FileText className="w-4 h-4" /> Position Applied For
-              </p>
-              <p className="text-white font-bold text-xl">{applicationData.position}</p>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-8 py-6 border-b-2 border-dashed border-purple-300">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <p className="text-purple-700 text-sm font-medium mb-1">APPLICATION NUMBER</p>
-                <p className="font-mono text-2xl font-bold text-purple-900 break-all">
+                <p style={{ margin: '0', fontSize: '20px', color: '#1f2937', fontWeight: 'bold', fontFamily: 'monospace', letterSpacing: '2px' }}>
                   {applicationData.applicationNumber}
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-purple-700 text-sm font-medium mb-1 flex items-center justify-end gap-1">
-                  <Calendar className="w-4 h-4" /> Submitted On
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                  Date of Submission
                 </p>
-                <p className="text-purple-900 font-semibold">{applicationData.submittedDate}</p>
+                <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
+                  {applicationData.submittedDate}
+                </p>
               </div>
             </div>
-          </div>
 
-          <div className="px-8 py-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Payment Details
-            </h3>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-green-700 text-xs uppercase tracking-wide mb-1">Amount Paid</p>
-                <p className="text-green-600 text-3xl font-bold">Rs {applicationData.amount}</p>
+            <div style={{ marginBottom: '30px' }}>
+              <h2 style={{ margin: '0 0 15px 0', fontSize: '18px', fontWeight: 'bold', color: '#1f2937', borderBottom: '2px solid #3b82f6', paddingBottom: '10px' }}>
+                APPLICANT DETAILS
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                    Full Name
+                  </p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
+                    {applicationData.fullName}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                    Email
+                  </p>
+                  <p style={{ margin: '0', fontSize: '13px', color: '#1f2937', fontWeight: '500', wordBreak: 'break-all' }}>
+                    {applicationData.email}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                    Phone
+                  </p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
+                    {applicationData.phone}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>
+                    Department
+                  </p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
+                    {applicationData.department}
+                  </p>
+                </div>
               </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-700 text-xs uppercase tracking-wide mb-1">Payment Status</p>
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                  <p className="text-blue-900 text-2xl font-bold">{applicationData.paymentStatus}</p>
+              <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '2px solid #3b82f6' }}>
+                <div style={{ marginBottom: '10px' }}>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#1e40af', textTransform: 'uppercase' }}>
+                    Company Name
+                  </p>
+                  <p style={{ margin: '0', fontSize: '16px', color: '#1f2937', fontWeight: 'bold' }}>
+                    {applicationData.companyName}
+                  </p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#1e40af', textTransform: 'uppercase' }}>
+                    Position Applied For
+                  </p>
+                  <p style={{ margin: '0', fontSize: '16px', color: '#1f2937', fontWeight: 'bold' }}>
+                    {applicationData.position}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <p className="text-gray-600 text-xs uppercase tracking-wide mb-1">Order ID</p>
-                <p className="font-mono text-sm text-gray-900 break-all">{applicationData.orderId}</p>
-              </div>
-
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                <p className="text-blue-600 text-xs uppercase tracking-wide mb-1">Payment ID</p>
-                <p className="font-mono text-sm text-gray-900 break-all">{applicationData.paymentId}</p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-3">
-                <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                  <p className="text-purple-600 text-xs uppercase tracking-wide mb-1">Payment Method</p>
-                  <p className="text-gray-900 font-semibold">{applicationData.paymentMethod}</p>
+            <div style={{ marginBottom: '30px' }}>
+              <h2 style={{ margin: '0 0 15px 0', fontSize: '18px', fontWeight: 'bold', color: '#1f2937', borderBottom: '2px solid #3b82f6', paddingBottom: '10px' }}>
+                PAYMENT DETAILS
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ padding: '15px', backgroundColor: '#dbeafe', borderRadius: '8px', border: '2px solid #3b82f6' }}>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#1e40af', textTransform: 'uppercase' }}>
+                    Amount Paid
+                  </p>
+                  <p style={{ margin: '0', fontSize: '28px', color: '#1e40af', fontWeight: 'bold' }}>
+                    Rs {applicationData.amount}
+                  </p>
                 </div>
+                <div style={{ padding: '15px', backgroundColor: '#dcfce7', borderRadius: '8px', border: '2px solid #16a34a' }}>
+                  <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#166534', textTransform: 'uppercase' }}>
+                    Payment Status
+                  </p>
+                  <p style={{ margin: '0', fontSize: '24px', color: '#15803d', fontWeight: 'bold' }}>
+                    {applicationData.paymentStatus}
+                  </p>
+                </div>
+              </div>
 
-                <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
-                  <p className="text-indigo-600 text-xs uppercase tracking-wide mb-1">Transaction Date</p>
-                  <p className="text-gray-900 font-semibold">{applicationData.transactionDate}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
+                    Order ID
+                  </p>
+                  <p style={{ margin: '0', fontSize: '11px', color: '#1f2937', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    {applicationData.orderId}
+                  </p>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
+                    Payment ID
+                  </p>
+                  <p style={{ margin: '0', fontSize: '11px', color: '#1f2937', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    {applicationData.paymentId}
+                  </p>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
+                    Payment Method
+                  </p>
+                  <p style={{ margin: '0', fontSize: '12px', color: '#1f2937', fontWeight: '500' }}>
+                    {applicationData.paymentMethod}
+                  </p>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '10px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>
+                    Transaction Date
+                  </p>
+                  <p style={{ margin: '0', fontSize: '12px', color: '#1f2937', fontWeight: '500' }}>
+                    {applicationData.transactionDate}
+                  </p>
                 </div>
               </div>
             </div>
+
+            <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '2px solid #e5e7eb', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666', fontWeight: '500' }}>
+                This is an auto-generated receipt. Please keep it for your records.
+              </p>
+              <p style={{ margin: '0', fontSize: '11px', color: '#999' }}>
+                Generated on {new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+              </p>
+            </div>
           </div>
 
-          <div className="bg-yellow-50 border-t border-yellow-200 px-8 py-4">
-            <p className="text-yellow-800 text-sm">
-              <strong>Important:</strong> Please save your Application Number for future reference. 
-              You will receive a confirmation email at <strong>{applicationData.email}</strong> shortly.
-            </p>
+          {/* Visible Application Success Card */}
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <User className="w-6 h-6" />
+                Applicant Details
+              </h2>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <p className="text-blue-100 text-sm mb-1">Full Name</p>
+                  <p className="text-white font-semibold text-lg">{applicationData.fullName}</p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
+                    <Mail className="w-4 h-4" /> Email
+                  </p>
+                  <p className="text-white font-semibold break-all">{applicationData.email}</p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
+                    <Phone className="w-4 h-4" /> Phone
+                  </p>
+                  <p className="text-white font-semibold">{applicationData.phone}</p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <p className="text-blue-100 text-sm mb-1 flex items-center gap-1">
+                    <Building className="w-4 h-4" /> Department
+                  </p>
+                  <p className="text-white font-semibold">{applicationData.department}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <p className="text-blue-100 text-sm mb-2 flex items-center gap-1">
+                  <Briefcase className="w-4 h-4" /> Company & Position
+                </p>
+                <p className="text-white font-bold text-xl mb-1">{applicationData.companyName}</p>
+                <p className="text-blue-100 font-medium">{applicationData.position}</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-8 py-6 border-b-2 border-dashed border-purple-300">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <p className="text-purple-700 text-sm font-medium mb-1">APPLICATION NUMBER</p>
+                  <p className="font-mono text-3xl font-bold text-purple-900 tracking-widest">
+                    {applicationData.applicationNumber}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-purple-700 text-sm font-medium mb-1 flex items-center justify-end gap-1">
+                    <Calendar className="w-4 h-4" /> Submitted On
+                  </p>
+                  <p className="text-purple-900 font-semibold">{applicationData.submittedDate}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-8 py-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Payment Details
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-green-700 text-xs uppercase tracking-wide mb-1">Amount Paid</p>
+                  <p className="text-green-600 text-3xl font-bold">Rs {applicationData.amount}</p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-blue-700 text-xs uppercase tracking-wide mb-1">Payment Status</p>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                    <p className="text-blue-900 text-2xl font-bold">{applicationData.paymentStatus}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <p className="text-gray-600 text-xs uppercase tracking-wide mb-1">Order ID</p>
+                  <p className="font-mono text-sm text-gray-900 break-all">{applicationData.orderId}</p>
+                </div>
+
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <p className="text-blue-600 text-xs uppercase tracking-wide mb-1">Payment ID</p>
+                  <p className="font-mono text-sm text-gray-900 break-all">{applicationData.paymentId}</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                    <p className="text-purple-600 text-xs uppercase tracking-wide mb-1">Payment Method</p>
+                    <p className="text-gray-900 font-semibold">{applicationData.paymentMethod}</p>
+                  </div>
+
+                  <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+                    <p className="text-indigo-600 text-xs uppercase tracking-wide mb-1">Transaction Date</p>
+                    <p className="text-gray-900 font-semibold">{applicationData.transactionDate}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border-t border-yellow-200 px-8 py-4">
+              <p className="text-yellow-800 text-sm">
+                <strong>Important:</strong> Please save your Application Number <strong className="font-mono text-lg">{applicationData.applicationNumber}</strong> for future reference. 
+                You will receive a confirmation email at <strong>{applicationData.email}</strong> shortly.
+              </p>
+            </div>
+
+            <div className="px-8 py-6 bg-gray-50 flex gap-4 flex-wrap">
+              <button
+                onClick={handleDownloadReceipt}
+                disabled={downloadingReceipt}
+                className="flex-1 min-w-[200px] bg-white border-2 border-blue-600 text-blue-600 py-3 px-6 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {downloadingReceipt ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5" />
+                    Download Receipt
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={handleBackToHome}
+                className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
 
-          <div className="px-8 py-6 bg-gray-50 flex gap-4 flex-wrap">
-            <button
-              onClick={handleDownloadReceipt}
-              disabled={downloadingReceipt}
-              className="flex-1 min-w-[200px] bg-white border-2 border-blue-600 text-blue-600 py-3 px-6 rounded-xl font-semibold hover:bg-blue-50 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {downloadingReceipt ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  Generating PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5" />
-                  Download Receipt
-                </>
-              )}
-            </button>
-            
-            <button
-              onClick={handleBackToHome}
-              className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-            >
-              Back to Home
-            </button>
+          <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">What's Next?</h3>
+            <ol className="space-y-3">
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                <span className="text-gray-700">You will receive a confirmation email with your application details.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                <span className="text-gray-700">Our HR team will review your application within 3-5 business days.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                <span className="text-gray-700">If shortlisted, you will be contacted for the next steps via email or phone.</span>
+              </li>
+            </ol>
           </div>
-        </div>
-
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">What's Next?</h3>
-          <ol className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
-              <span className="text-gray-700">You will receive a confirmation email with your application details.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
-              <span className="text-gray-700">Our HR team will review your application within 3-5 business days.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
-              <span className="text-gray-700">If shortlisted, you'll be contacted for the next steps via email or phone.</span>
-            </li>
-          </ol>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

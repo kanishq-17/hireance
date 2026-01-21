@@ -8,7 +8,6 @@ const CompanyHeader = ({
   uploadDate,
   onApply,
 }) => {
-
   return (
     <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Banner */}
@@ -58,10 +57,10 @@ export default CompanyHeader;
 /* ---------------- helper ---------------- */
 
 const getJobPostedTime = (postedAt) => {
-  const postedTime = new Date(postedAt); // job post time
-  const currentTime = new Date(); // user system time
+  const postedTime = new Date(postedAt);
+  const currentTime = new Date();
 
-  const diffMs = currentTime - postedTime; // difference in milliseconds
+  const diffMs = currentTime - postedTime;
 
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
